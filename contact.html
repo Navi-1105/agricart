@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Contact Us - Agricart</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="logo">Agricart</div>
+    <nav class="navbar">
+      <a href="index.html">Home</a>
+      <a href="products.html">Products</a>
+      <a href="cart.html">Cart</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+      <a href="login.html" class="auth-link">Sign In</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1>Contact Us</h1>
+      <p class="subtitle">Are you a farmer interested in selling your produce on Agricart? Fill out the form below and our team will connect with you!</p>
+      <p class="contact-phone">Or call us directly: <a href="tel:+918284000103">+91 82840 00103</a>
+      </p>
+      <p class="contact-phone">Or mail at:<a href="somalnavneetkaur@gmail.com">somalnavneetkaur@gmail.com</a></p>
+    </section>
+
+    <section class="contact-section">
+      <form class="contact-form" action="https://somalnavneetkaur@gmail.com" method="POST" id="farmer-contact-form">
+        <label for="name">Name</label>
+        <input type="text" id="name" name="name" required>
+
+        <label for="phone">Phone</label>
+        <input type="tel" id="phone" name="phone" required>
+
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="message">Message</label>
+        <textarea id="message" name="message" rows="4" placeholder="Tell us about your farm, your produce, or any questions you have..." required></textarea>
+
+        <button type="submit" class="cta-button" style="margin-top:18px;">Send Message</button>
+      </form>
+      <div id="contact-success" style="display:none;margin-top:24px;padding:18px 20px;background:#e8f6ef;border-radius:14px;color:#43aa8b;font-weight:600;text-align:center;box-shadow:0 2px 12px #43aa8b11;">
+        Thank you for reaching out! We have received your message and will contact you soon.
+      </div>
+    </section>
+    <script>
+      document.getElementById('farmer-contact-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        var form = this;
+        var data = new FormData(form);
+        fetch(form.action, {
+          method: 'POST',
+          body: data,
+          headers: { 'Accept': 'application/json' }
+        }).then(function(response) {
+          if (response.ok) {
+            form.reset();
+            document.getElementById('contact-success').style.display = 'block';
+          } else {
+            alert('There was an error sending your message. Please try again.');
+          }
+        }).catch(function() {
+          alert('There was an error sending your message. Please try again.');
+        });
+      });
+    </script>
+  </main>
+
+  <footer>
+    <p>© 2025 Agricart. All rights reserved.</p>
+  </footer>
+</body>
+</html> 

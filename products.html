@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Agricart - Products</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="logo">Agricart</div>
+    <nav class="navbar">
+      <a href="index.html">Home</a>
+      <a href="products.html">Products</a>
+      <a href="cart.html">Cart</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+      <a href="login.html" class="auth-link">Sign In</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1>Our Products</h1>
+      <p class="subtitle">Browse fresh, local produce from Punjab’s farmers.</p>
+    </section>
+
+    <section class="product-list">
+      <!-- Example product cards -->
+      <div class="feature-card">
+        <img src="tomato.png" alt="Organic Tomatoes" class="feature-icon">
+        <h2>Organic Tomatoes</h2>
+        <p>₹40/kg &middot; Freshly picked</p>
+        <a class="cta-button add-to-cart-btn" href="#" data-name="Organic Tomatoes" data-price="40" data-image="tomato.png">Add to Cart</a>
+      </div>
+      <div class="feature-card">
+        <img src="rice.png" alt="Basmati Rice" class="feature-icon">
+        <h2>Basmati Rice</h2>
+        <p>₹90/kg &middot; Aromatic & long grain</p>
+        <a class="cta-button add-to-cart-btn" href="#" data-name="Basmati Rice" data-price="90" data-image="rice.png">Add to Cart</a>
+      </div>
+      <div class="feature-card">
+        <img src="potato.png" alt="Punjabi Potatoes" class="feature-icon">
+        <h2>Punjabi Potatoes</h2>
+        <p>₹25/kg &middot; Farm fresh</p>
+        <a class="cta-button add-to-cart-btn" href="#" data-name="Punjabi Potatoes" data-price="25" data-image="potato.png">Add to Cart</a>
+      </div>
+      <!-- Add more product cards as needed -->
+    </section>
+  </main>
+
+  <a href="cart.html" class="view-cart-btn">View the Cart</a>
+  <footer>
+    <p>© 2025 Agricart. All rights reserved.</p>
+  </footer>
+
+  <script>
+    function getCart() {
+      return JSON.parse(localStorage.getItem('cart') || '[]');
+    }
+    function saveCart(cart) {
+      localStorage.setItem('cart', JSON.stringify(cart));
+    }
+    document.querySelectorAll('.add-to-cart-btn').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const name = btn.getAttribute('data-name');
+        const price = parseFloat(btn.getAttribute('data-price'));
+        const image = btn.getAttribute('data-image');
+        let cart = getCart();
+        let found = false;
+        cart = cart.map(item => {
+          if (item.name === name) {
+            found = true;
+            return { ...item, quantity: item.quantity + 1 };
+          }
+          return item;
+        });
+        if (!found) {
+          cart.push({ name, price, image, quantity: 1 });
+        }
+        saveCart(cart);
+        btn.textContent = 'Added!';
+        setTimeout(() => { btn.textContent = 'Add to Cart'; }, 1000);
+      });
+    });
+  </script>
+</body>
+</html>
