@@ -12,7 +12,7 @@
     <nav class="navbar">
       <a href="index.html">Home</a>
       <a href="products.html">Products</a>
-      <a href="cart.html">Cart</a>
+      <a href="cart.html">Cart <span id="cart-badge" class="cart-badge" aria-live="polite">0</span></a>
       <a href="about.html">About</a>
       <a href="contact.html">Contact</a>
       <a href="login.html" class="auth-link">Sign In</a>
@@ -72,7 +72,7 @@
           total += itemTotal;
           const tr = document.createElement('tr');
           tr.innerHTML = `
-            <td><img src="${item.image}" alt="${item.name}" class="feature-icon" style="width:48px;height:48px;vertical-align:middle;"> ${item.name}</td>
+            <td><img src="${item.image}" alt="${item.name} - Cart item image" class="feature-icon" style="width:48px;height:48px;vertical-align:middle;"> ${item.name}</td>
             <td>₹${item.price}/kg</td>
             <td>
               <input type="number" min="1" value="${item.quantity}" data-idx="${idx}" class="cart-qty-input" style="width:48px;padding:4px 6px;border-radius:8px;border:1px solid #ccc;text-align:center;">
@@ -84,8 +84,14 @@
         });
         totalCell.textContent = `₹${total}`;
       }
+      function updateCartBadge() {
+        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+        const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+        document.getElementById('cart-badge').textContent = count;
+      }
       document.addEventListener('DOMContentLoaded', function() {
         renderCart();
+        updateCartBadge();
         document.getElementById('cart-body').addEventListener('input', function(e) {
           if (e.target.classList.contains('cart-qty-input')) {
             const idx = parseInt(e.target.getAttribute('data-idx'));
@@ -95,6 +101,7 @@
             cart[idx].quantity = qty;
             saveCart(cart);
             renderCart();
+            updateCartBadge();
           }
         });
         document.getElementById('cart-body').addEventListener('click', function(e) {
@@ -105,6 +112,7 @@
             cart.splice(idx, 1);
             saveCart(cart);
             renderCart();
+            updateCartBadge();
           }
         });
       });

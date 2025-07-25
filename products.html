@@ -5,6 +5,27 @@
   <title>Agricart - Products</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nouislider@15.7.0/dist/nouislider.min.css">
+  <style>
+    /* Visual feedback for active filter/sort */
+    #filter:focus, #filter.active {
+      border: 2px solid #4CAF50;
+      background: #eaffea;
+    }
+    .slider-value {
+      font-weight: bold;
+      margin-left: 8px;
+      color: #388e3c;
+    }
+    .product-controls {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+    
+  </style>
 </head>
 <body>
   <header class="header">
@@ -12,7 +33,7 @@
     <nav class="navbar">
       <a href="index.html">Home</a>
       <a href="products.html">Products</a>
-      <a href="cart.html">Cart</a>
+      <a href="cart.html">Cart <span id="cart-badge" class="cart-badge" aria-live="polite">0</span></a>
       <a href="about.html">About</a>
       <a href="contact.html">Contact</a>
       <a href="login.html" class="auth-link">Sign In</a>
@@ -24,24 +45,47 @@
       <h1>Our Products</h1>
       <p class="subtitle">Browse fresh, local produce from Punjab’s farmers.</p>
     </section>
-
+    <section class="product-controls">
+      <label for="filter">Sort/Filter:</label>
+      <select id="filter">
+        <option value="all">All</option>
+        <option value="top-seller">Top Sellers</option>
+        <option value="price-low">Price: Low to High</option>
+        <option value="price-high">Price: High to Low</option>
+      </select>
+      <label>Price Range:</label>
+      <div id="price-slider" style="width:180px; margin:0 1rem;"></div>
+      <span id="price-range-value" class="slider-value">₹0 - ₹100</span>
+      <button id="apply-price-filter">Apply</button>
+    </section>
     <section class="product-list">
       <!-- Example product cards -->
-      <div class="feature-card">
-        <img src="tomato.png" alt="Organic Tomatoes" class="feature-icon">
+      <div class="feature-card top-seller">
+        <span class="top-seller-badge">Top Seller</span>
+        <img src="tomato.png" alt="Organic Tomatoes - Fresh, locally grown" class="feature-icon">
         <h2>Organic Tomatoes</h2>
+        <div class="rating">
+          <span>★</span><span>★</span><span>★</span><span>★</span><span>☆</span>
+        </div>
         <p>₹40/kg &middot; Freshly picked</p>
         <a class="cta-button add-to-cart-btn" href="#" data-name="Organic Tomatoes" data-price="40" data-image="tomato.png">Add to Cart</a>
       </div>
-      <div class="feature-card">
-        <img src="rice.png" alt="Basmati Rice" class="feature-icon">
+      <div class="feature-card top-seller">
+        <span class="top-seller-badge">Top Seller</span>
+        <img src="rice.png" alt="Basmati Rice - Aromatic, long grain" class="feature-icon">
         <h2>Basmati Rice</h2>
+        <div class="rating">
+          <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+        </div>
         <p>₹90/kg &middot; Aromatic & long grain</p>
         <a class="cta-button add-to-cart-btn" href="#" data-name="Basmati Rice" data-price="90" data-image="rice.png">Add to Cart</a>
       </div>
       <div class="feature-card">
-        <img src="potato.png" alt="Punjabi Potatoes" class="feature-icon">
+        <img src="potato.png" alt="Punjabi Potatoes - Farm fresh" class="feature-icon">
         <h2>Punjabi Potatoes</h2>
+        <div class="rating">
+          <span>★</span><span>★</span><span>★</span><span>☆</span><span>☆</span>
+        </div>
         <p>₹25/kg &middot; Farm fresh</p>
         <a class="cta-button add-to-cart-btn" href="#" data-name="Punjabi Potatoes" data-price="25" data-image="potato.png">Add to Cart</a>
       </div>
@@ -54,34 +98,96 @@
     <p>© 2025 Agricart. All rights reserved.</p>
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/nouislider@15.7.0/dist/nouislider.min.js"></script>
   <script>
-    function getCart() {
-      return JSON.parse(localStorage.getItem('cart') || '[]');
-    }
-    function saveCart(cart) {
-      localStorage.setItem('cart', JSON.stringify(cart));
-    }
-    document.querySelectorAll('.add-to-cart-btn').forEach(function(btn) {
-      btn.addEventListener('click', function(e) {
-        e.preventDefault();
-        const name = btn.getAttribute('data-name');
-        const price = parseFloat(btn.getAttribute('data-price'));
-        const image = btn.getAttribute('data-image');
-        let cart = getCart();
-        let found = false;
-        cart = cart.map(item => {
-          if (item.name === name) {
-            found = true;
-            return { ...item, quantity: item.quantity + 1 };
-          }
-          return item;
-        });
-        if (!found) {
-          cart.push({ name, price, image, quantity: 1 });
+    document.addEventListener('DOMContentLoaded', function() {
+      const priceSlider = document.getElementById('price-slider');
+      noUiSlider.create(priceSlider, {
+        start: [0, 100],
+        connect: true,
+        range: {
+          'min': 0,
+          'max': 100
+        },
+        step: 1,
+        tooltips: [true, true],
+        format: {
+          to: value => Math.round(value),
+          from: value => Number(value)
         }
-        saveCart(cart);
-        btn.textContent = 'Added!';
-        setTimeout(() => { btn.textContent = 'Add to Cart'; }, 1000);
+      });
+
+      priceSlider.noUiSlider.on('update', function(values) {
+        document.getElementById('price-range-value').textContent = `₹${values[0]} - ₹${values[1]}`;
+      });
+
+      function filterProducts() {
+        const filter = document.getElementById('filter').value;
+        const [minPrice, maxPrice] = priceSlider.noUiSlider.get().map(Number);
+        const cards = document.querySelectorAll('.feature-card');
+        cards.forEach(card => {
+          card.style.display = 'block';
+          const price = parseFloat(card.querySelector('p').textContent.replace(/[^\d]/g, ''));
+          if (filter === 'top-seller' && !card.classList.contains('top-seller')) {
+            card.style.display = 'none';
+          }
+          if (price < minPrice || price > maxPrice) {
+            card.style.display = 'none';
+          }
+        });
+        // Sorting logic
+        if (filter === 'price-low' || filter === 'price-high') {
+          const productList = document.querySelector('.product-list');
+          const sorted = Array.from(cards).sort((a, b) => {
+            const priceA = parseFloat(a.querySelector('p').textContent.replace(/[^\d]/g, ''));
+            const priceB = parseFloat(b.querySelector('p').textContent.replace(/[^\d]/g, ''));
+            return filter === 'price-low' ? priceA - priceB : priceB - priceA;
+          });
+          sorted.forEach(card => productList.appendChild(card));
+        }
+      }
+
+      document.getElementById('filter').addEventListener('change', filterProducts);
+      document.getElementById('apply-price-filter').addEventListener('click', filterProducts);
+      priceSlider.noUiSlider.on('change', filterProducts);
+
+      function updateCartBadge() {
+        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+        const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+        document.getElementById('cart-badge').textContent = count;
+      }
+      // Call on page load
+      updateCartBadge();
+      // Also call after add to cart
+      function getCart() {
+        return JSON.parse(localStorage.getItem('cart') || '[]');
+      }
+      function saveCart(cart) {
+        localStorage.setItem('cart', JSON.stringify(cart));
+      }
+      document.querySelectorAll('.add-to-cart-btn').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          const name = btn.getAttribute('data-name');
+          const price = parseFloat(btn.getAttribute('data-price'));
+          const image = btn.getAttribute('data-image');
+          let cart = getCart();
+          let found = false;
+          cart = cart.map(item => {
+            if (item.name === name) {
+              found = true;
+              return { ...item, quantity: item.quantity + 1 };
+            }
+            return item;
+          });
+          if (!found) {
+            cart.push({ name, price, image, quantity: 1 });
+          }
+          saveCart(cart);
+          btn.textContent = 'Added!';
+          updateCartBadge();
+          setTimeout(() => { btn.textContent = 'Add to Cart'; }, 1000);
+        });
       });
     });
   </script>

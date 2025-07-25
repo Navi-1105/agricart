@@ -51,4 +51,4 @@ agricart/
 - For queries, contact: somalnavneetkaur@gmail.com | +91 82840 00103
 
 ---
-*Empowering Punjab’s farmers. Delivering fresh, local produce to your doorstep.* 
+*Empowering Punjab’s farmers. Delivering fresh, local produce to your doorstep.*
